@@ -1,14 +1,18 @@
 from errbot import BotPlugin, botcmd
 from optparse import OptionParser
 
-from libcloud.compute.types import Provider, NodeState
-from libcloud.compute.providers import get_driver
-from libcloud.compute.base import NodeImage
-from libcloud.compute.drivers.ec2 import EC2SubnetAssociation
-
 import time
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+try:
+    from libcloud.compute.types import Provider, NodeState
+    from libcloud.compute.providers import get_driver
+    from libcloud.compute.base import NodeImage
+    from libcloud.compute.drivers.ec2 import EC2SubnetAssociation
+except ImportError as _:
+    logging.exception("Please install 'apache-libcloud' python package")
+
 
 class AWS(BotPlugin):
 
@@ -195,4 +199,3 @@ class AWS(BotPlugin):
 
         self.send(msg.getFrom(), '{0}: [3/3] Request completed'.format(vmname), message_type=msg.getType())
         self.send(msg.getFrom(), '{0}: {1}'.format(vmname, self._basic_instance_details(vmname)), message_type=msg.getType())
-
