@@ -77,6 +77,8 @@ class AWS(BotPlugin):
     def aws_info(self, msg, args):
         ''' get details of a virtual machine
             options: name
+            example:
+            !aws info log1
         '''
         vmname = args.pop(0)
         details = self._basic_instance_details(vmname)
@@ -88,7 +90,7 @@ class AWS(BotPlugin):
             options:
                 vm (name): name of virtual machine
             example:
-            !aws vm_reboot log1
+            !aws reboot log1
         '''
         vm = self._find_instance_by_name(args)
         result = vm.reboot()
@@ -107,7 +109,7 @@ class AWS(BotPlugin):
             options:
                 vm (name): name of instance
             example:
-            !aws vm_terminate log1
+            !aws terminate log1
         '''
         vm = self._find_instance_by_name(args)
         result = vm.destroy()
