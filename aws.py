@@ -3,15 +3,16 @@ from optparse import OptionParser
 
 import time
 import logging
-logging.basicConfig(level=logging.DEBUG)
+
+log = logging.getLogger(name='errbot.plugins.AWS')
 
 try:
     from libcloud.compute.types import Provider, NodeState
     from libcloud.compute.providers import get_driver
     from libcloud.compute.base import NodeImage
     from libcloud.compute.drivers.ec2 import EC2SubnetAssociation
-except ImportError as _:
-    logging.exception("Please install 'apache-libcloud' python package")
+except ImportError:
+    log.error("Please install 'apache-libcloud' python package")
 
 
 class AWS(BotPlugin):
