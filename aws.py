@@ -82,9 +82,9 @@ class AWS(BotPlugin):
         '''
         vmname = args.pop(0)
         details = self._basic_instance_details(vmname)
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: {1}'.format(vmname, details),
-                  message_type=msg.getType())
+                  message_type=msg.type)
 
     @botcmd
     def aws_reboot(self, msg, args):
@@ -102,9 +102,9 @@ class AWS(BotPlugin):
         else:
             response = 'Unable to complete request.'
 
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: {1}'.format(vm.name, response),
-                  message_type=msg.getType())
+                  message_type=msg.type)
 
     @botcmd
     def aws_terminate(self, msg, args):
@@ -122,9 +122,9 @@ class AWS(BotPlugin):
         else:
             response = 'Unable to complete request.'
 
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: {1}'.format(vm.name, response),
-                  message_type=msg.getType())
+                  message_type=msg.type)
 
     @botcmd(split_args_with=' ')
     def aws_create(self, msg, args):
@@ -201,25 +201,25 @@ class AWS(BotPlugin):
                                   ex_blockdevicemappings=block_dev_mappings,
                                   ex_metadata=base_tags)
 
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: [1/3] Creating instance'.format(vmname),
-                  message_type=msg.getType())
+                  message_type=msg.type)
         # todo: actually query state of instance
         # time.sleep(30)
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: [2/3] Running post setup'.format(vmname),
-                  message_type=msg.getType())
+                  message_type=msg.type)
 
         if options['puppet']:
             # ready for puppet... let's go!
-            self.send(msg.getFrom(),
+            self.send(msg.frm,
                       '{0}: Running puppet [disabled]'.format(vmname),
-                      message_type=msg.getType())
+                      message_type=msg.type)
 
-        self.send(msg.getFrom(),
+        self.send(msg.frm,
                   '{0}: [3/3] Request completed'.format(vmname),
-                  message_type=msg.getType())
-        self.send(msg.getFrom(),
+                  message_type=msg.type)
+        self.send(msg.frm,
                   '{0}: {1}'.format(vmname,
                                     self._basic_instance_details(vmname)),
-                  message_type=msg.getType())
+                  message_type=msg.type)
