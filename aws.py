@@ -84,7 +84,9 @@ class AWS(BotPlugin):
         details = self._basic_instance_details(vmname)
         self.send(msg.frm,
                   '{0}: {1}'.format(vmname, details),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
 
     @botcmd
     def aws_reboot(self, msg, args):
@@ -124,7 +126,9 @@ class AWS(BotPlugin):
 
         self.send(msg.frm,
                   '{0}: {1}'.format(vm.name, response),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
 
     @botcmd(split_args_with=' ')
     def aws_create(self, msg, args):
@@ -203,23 +207,33 @@ class AWS(BotPlugin):
 
         self.send(msg.frm,
                   '{0}: [1/3] Creating instance'.format(vmname),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
         # todo: actually query state of instance
         # time.sleep(30)
         self.send(msg.frm,
                   '{0}: [2/3] Running post setup'.format(vmname),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
 
         if options['puppet']:
             # ready for puppet... let's go!
             self.send(msg.frm,
                       '{0}: Running puppet [disabled]'.format(vmname),
-                      message_type=msg.type)
+                      message_type=msg.type,
+                      in_reply_to=msg,
+                      groupchat_nick_reply=True)
 
         self.send(msg.frm,
                   '{0}: [3/3] Request completed'.format(vmname),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
         self.send(msg.frm,
                   '{0}: {1}'.format(vmname,
                                     self._basic_instance_details(vmname)),
-                  message_type=msg.type)
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
