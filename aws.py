@@ -1,8 +1,9 @@
 from errbot import BotPlugin, botcmd
 from optparse import OptionParser
 
-import time
 import logging
+import socket
+import time
 
 log = logging.getLogger(name='errbot.plugins.AWS')
 
@@ -13,6 +14,11 @@ try:
     from libcloud.compute.drivers.ec2 import EC2SubnetAssociation
 except ImportError:
     log.error("Please install 'apache-libcloud' python package")
+
+try:
+    import feedparser
+except ImportError:
+    log.error("Please install 'feedparser' python package")
 
 
 class AWS(BotPlugin):
@@ -234,6 +240,69 @@ class AWS(BotPlugin):
         self.send(msg.frm,
                   '{0}: {1}'.format(vmname,
                                     self._basic_instance_details(vmname)),
+                  message_type=msg.type,
+                  in_reply_to=msg,
+                  groupchat_nick_reply=True)
+
+    def _parse_status_results(self, results):
+        response = []
+        count = 1 
+        for result in results:
+            response.append('{0}. ({1}) {2} - {3}'.format(
+                count,
+                result['published'],
+                result['title'],
+                result['summary'],
+                )
+            )
+            count = count + 1 
+        return ' '.join(response)
+
+    @botcmd(split_args_with=' ')
+    def aws_status(self, msg, args):
+        ''' Get rss feed from aws status page
+            options:
+                service (str): services (ec2 [default], elb, route53, s3, vpc, etc)
+                timeout (int): rss feed timeout value
+                region  (str): regions (us-east-1 [default], us-west-1, ap-southeast-1, etc)
+                entries (int): last number of entries from feed (default: 1)
+            example:
+            !aws status --service=route53 --region=us-west-2
+        '''
+        parser = OptionParser()
+        parser.add_option("--service", dest="service", default='ec2')
+        parser.add_option("--timeout", dest="timeout", type='int', default=5)
+        parser.add_option("--region", dest="region", default='us-east-1')
+        parser.add_option("--entries", dest="entries", type='int', default=1)
+
+        (t_options, t_args) = parser.parse_args(args)
+        options = vars(t_options)
+
+        # set timeout
+        timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(options['timeout'])
+
+        aws_url = 'http://status.aws.amazon.com/rss/{}-{}.rss'.format(
+            options['service'],
+            options['region']
+        )
+        log.debug('Getting feed from {}'.format(aws_url))
+
+        feeds = feedparser.parse(aws_url)
+
+        if len(feeds['entries']) < 1:
+            self.send(msg.frm,
+                      'No entries found.',
+                      message_type=msg.type,
+                      in_reply_to=msg,
+                      groupchat_nick_reply=True)
+            return
+
+        content = self._parse_status_results(feeds['entries'][:options['entries']])
+        content += ' Source: {}'.format(aws_url)
+
+        self.send(msg.frm,
+                  content,
                   message_type=msg.type,
                   in_reply_to=msg,
                   groupchat_nick_reply=True)
