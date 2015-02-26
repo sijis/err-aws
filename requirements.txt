@@ -1,2 +1,2 @@
 feedparser
-requests
+apache-libcloud
